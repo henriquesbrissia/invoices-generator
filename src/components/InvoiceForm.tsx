@@ -92,7 +92,7 @@ export default function InvoiceForm({ onSubmit }: { onSubmit: (data: InvoiceData
         localStorage.removeItem('invoiceFormData');
       }
     }
-  }, [form, items]);
+  }, []);
 
   const addItem = () => {
     setItems([...items, { 
