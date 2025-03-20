@@ -17,6 +17,7 @@ export default function Home() {
 
   const handleBackToForm = () => {
     setShowPreview(false);
+    setInvoiceData(null);
   };
 
   const toggleTemplate = () => {
