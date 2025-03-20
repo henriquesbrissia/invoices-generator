@@ -275,14 +275,6 @@ export default function InvoiceForm({ onSubmit }: { onSubmit: (data: InvoiceData
     );
   };
 
-  const handleStartDateChange = (date: Date | null, index: number) => {
-    updateItem(index, 'startDate', date);
-  };
-
-  const handleEndDateChange = (date: Date | null, index: number) => {
-    updateItem(index, 'endDate', date);
-  };
-
   return (
     <div className="max-w-5xl mx-auto p-4">
       <Card>
