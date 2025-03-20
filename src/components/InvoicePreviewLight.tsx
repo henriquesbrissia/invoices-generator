@@ -30,14 +30,19 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
     // Helper function to format the date range
     const formatDateRange = (item: InvoiceData['items'][0]) => {
       if (item.startDate && item.endDate) {
-        const start = format(item.startDate, 'd MMM', { locale: ptBR });
-        const end = format(item.endDate, 'd MMM', { locale: ptBR });
-        const year = format(item.endDate, 'yyyy');
-        return `${start} - ${end} ${year}`.toUpperCase();
+        try {
+          const start = format(item.startDate, 'd MMM', { locale: ptBR });
+          const end = format(item.endDate, 'd MMM', { locale: ptBR });
+          const year = format(item.endDate, 'yyyy');
+          return `${start} - ${end} ${year}`.toUpperCase();
+        } catch (error) {
+          console.error('Error formatting date range:', error);
+          return item.date ? item.date.toUpperCase() : '';
+        }
       }
       
       // Fallback for the date field if startDate and endDate are not present
-      return item.date.toUpperCase();
+      return item.date ? item.date.toUpperCase() : '';
     };
 
     // Method to generate PDF using pure Canvas (high quality)

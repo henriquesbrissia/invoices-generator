@@ -89,6 +89,7 @@ export default function InvoiceForm({ onSubmit }: { onSubmit: (data: InvoiceData
         setItems(parsedData.items || items);
       } catch (error) {
         console.error('Error loading saved data:', error);
+        localStorage.removeItem('invoiceFormData');
       }
     }
   }, [form, items]);
@@ -148,16 +149,32 @@ export default function InvoiceForm({ onSubmit }: { onSubmit: (data: InvoiceData
   };
 
   const handleSubmit = (data: InvoiceData) => {
-    const formData = {
-      ...data,
-      items: items
-    };
-    
-    // Save to localStorage
-    localStorage.setItem('invoiceFormData', JSON.stringify(formData));
-    
-    // Continue with invoice generation
-    onSubmit(formData);
+    try {
+      // Prepare final data
+      const finalData = {
+        ...data,
+        // Ensure we use the latest items state
+        items: items.map(item => ({
+          ...item,
+          // Clone dates to avoid reference issues
+          startDate: item.startDate ? new Date(item.startDate.getTime()) : null,
+          endDate: item.endDate ? new Date(item.endDate.getTime()) : null
+        }))
+      };
+      
+      // Save to localStorage
+      try {
+        localStorage.setItem('invoiceFormData', JSON.stringify(finalData));
+      } catch (error) {
+        console.error('Error saving to localStorage:', error);
+      }
+      
+      // Call the onSubmit callback
+      onSubmit(finalData);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.');
+    }
   };
 
   // Custom component for date range picker
@@ -191,11 +208,17 @@ export default function InvoiceForm({ onSubmit }: { onSubmit: (data: InvoiceData
     
     const handleApply = () => {
       if (item.startDate && item.endDate) {
-        const start = format(item.startDate, 'MMM dd', { locale: ptBR });
-        const end = format(item.endDate, 'MMM dd', { locale: ptBR });
-        const year = format(item.endDate, 'yyyy');
-        
-        updateItem(index, 'date', `${start} - ${end} ${year}`);
+        try {
+          const start = format(item.startDate, 'MMM dd', { locale: ptBR });
+          const end = format(item.endDate, 'MMM dd', { locale: ptBR });
+          const year = format(item.endDate, 'yyyy');
+          
+          updateItem(index, 'date', `${start} - ${end} ${year}`);
+        } catch (error) {
+          console.error('Error formatting dates:', error);
+          // Fallback to a safe default
+          updateItem(index, 'date', '');
+        }
       }
       setIsOpen(false);
     };
@@ -227,7 +250,15 @@ export default function InvoiceForm({ onSubmit }: { onSubmit: (data: InvoiceData
                 <Label className="mb-2 block">Start Date</Label>
                 <DatePicker
                   selected={item.startDate}
-                  onChange={(date: Date | null) => updateItem(index, 'startDate', date)}
+                  onChange={(date: Date | null) => {
+                    if (date !== null) {
+                      try {
+                        updateItem(index, 'startDate', date);
+                      } catch (error) {
+                        console.error('Error updating startDate:', error);
+                      }
+                    }
+                  }}
                   selectsStart
                   startDate={item.startDate || undefined}
                   endDate={item.endDate || undefined}
@@ -240,7 +271,15 @@ export default function InvoiceForm({ onSubmit }: { onSubmit: (data: InvoiceData
                 <Label className="mb-2 block">End Date</Label>
                 <DatePicker
                   selected={item.endDate}
-                  onChange={(date: Date | null) => updateItem(index, 'endDate', date)}
+                  onChange={(date: Date | null) => {
+                    if (date !== null) {
+                      try {
+                        updateItem(index, 'endDate', date);
+                      } catch (error) {
+                        console.error('Error updating endDate:', error);
+                      }
+                    }
+                  }}
                   selectsEnd
                   startDate={item.startDate || undefined}
                   endDate={item.endDate || undefined}
