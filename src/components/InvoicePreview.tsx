@@ -11,7 +11,7 @@ type InvoicePreviewProps = {
 };
 
 const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
-  ({ data, onBack }, ref) => {
+  ({ data, onBack }, _) => {
     const invoiceRef = useRef<HTMLDivElement>(null);
     const [isGenerating, setIsGenerating] = useState(false);
 
