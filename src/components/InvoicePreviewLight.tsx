@@ -1,17 +1,21 @@
-import { forwardRef, useRef, CSSProperties, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { InvoiceData } from './InvoiceForm';
-import jsPDF from 'jspdf';
+import { forwardRef, useRef, useState, CSSProperties } from "react";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { InvoiceData } from "@/lib/schema";
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from '@/components/theme-toggle';
 
 type InvoicePreviewLightProps = {
   data: InvoiceData;
   onBack: () => void;
+  onThemeChange?: (value: 'dark' | 'light') => void;
+  currentTheme?: 'dark' | 'light';
 };
 
 const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>(
-  ({ data, onBack }) => {
+  ({ data, onBack, onThemeChange, currentTheme = 'light' }) => {
     const invoiceRef = useRef<HTMLDivElement>(null);
     const [isGenerating, setIsGenerating] = useState(false);
 
@@ -118,7 +122,7 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
           ctx.fillStyle = '#64748b';
           ctx.fillText('VAT Number:', margin, y);
           ctx.fillStyle = '#1e293b';
-          ctx.fillText(data.fromVat, margin + 150 * scale, y);
+          ctx.fillText(data.fromVat, margin + 105 * scale, y);
         }
         
         // TO
@@ -146,7 +150,7 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
           ctx.fillStyle = '#64748b';
           ctx.fillText('EIN Number:', colCenter, y);
           ctx.fillStyle = '#1e293b';
-          ctx.fillText(data.toEin, colCenter + 120 * scale, y);
+          ctx.fillText(data.toEin, colCenter + 100 * scale, y);
         }
         
         // ITEMS TABLE
@@ -169,14 +173,6 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         ctx.textAlign = 'right';
         ctx.fillText('RATE', rateCol, tableY);
         ctx.fillText('TOTAL', totalCol, tableY);
-        
-        // Draw a subtle header line
-        ctx.strokeStyle = '#e2e8f0';
-        ctx.lineWidth = 2 * scale;
-        ctx.beginPath();
-        ctx.moveTo(margin, tableY + 10 * scale);
-        ctx.lineTo(width - margin, tableY + 10 * scale);
-        ctx.stroke();
         
         // Items
         let itemY = tableY + 40 * scale;
@@ -206,14 +202,6 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
           
           // Next item
           itemY += 40 * scale;
-          
-          // Draw a subtle line after each item
-          ctx.strokeStyle = '#f1f5f9';
-          ctx.lineWidth = 1 * scale;
-          ctx.beginPath();
-          ctx.moveTo(margin, itemY - 10 * scale);
-          ctx.lineTo(width - margin, itemY - 10 * scale);
-          ctx.stroke();
         });
         
         // FINAL AMOUNT
@@ -251,14 +239,6 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         ctx.font = `${16 * scale}px Arial`;
         ctx.textAlign = 'left';
         ctx.fillText('PAYMENT INFORMATION', margin, footerY);
-        
-        // Draw a subtle line above the footer
-        ctx.strokeStyle = '#e2e8f0';
-        ctx.lineWidth = 2 * scale;
-        ctx.beginPath();
-        ctx.moveTo(margin, footerY - 30 * scale);
-        ctx.lineTo(width - margin, footerY - 30 * scale);
-        ctx.stroke();
         
         // Divide into columns
         const footerContentY = footerY + 40 * scale;
@@ -319,7 +299,6 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
       padding: '2rem',
       borderRadius: '0.5rem',
       boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-      border: '1px solid #e2e8f0'
     };
 
     const headerStyle: CSSProperties = {
@@ -360,7 +339,6 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
       textTransform: 'uppercase' as const,
       fontSize: '0.875rem',
       textAlign: 'left' as const,
-      borderBottom: '2px solid #e2e8f0',
       paddingBottom: '0.5rem'
     };
 
@@ -401,7 +379,6 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
 
     const footerStyle: CSSProperties = {
       marginTop: '3rem',
-      borderTop: '2px solid #e2e8f0',
       paddingTop: '1.5rem'
     };
 
@@ -421,14 +398,16 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
     
     return (
       <div className="max-w-5xl mx-auto p-4 space-y-4">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <Button variant="outline" onClick={onBack}>
             Back to Form
           </Button>
+          {onThemeChange && (
+            <ThemeToggle value={currentTheme} onChange={onThemeChange} />
+          )}
           <Button 
             onClick={generatePDF}
             disabled={isGenerating}
-            className="bg-blue-500 hover:bg-blue-600"
           >
             {isGenerating ? 'Generating PDF...' : 'Download PDF'}
           </Button>

@@ -1,17 +1,21 @@
-import { forwardRef, useRef, CSSProperties, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { InvoiceData } from './InvoiceForm';
-import jsPDF from 'jspdf';
+import { forwardRef, useRef, useState, CSSProperties } from "react";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { InvoiceData } from "@/lib/schema";
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from '@/components/theme-toggle';
 
 type InvoicePreviewProps = {
   data: InvoiceData;
   onBack: () => void;
+  onThemeChange?: (value: 'dark' | 'light') => void;
+  currentTheme?: 'dark' | 'light';
 };
 
 const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
-  ({ data, onBack }) => {
+  ({ data, onBack, onThemeChange, currentTheme = 'dark' }) => {
     const invoiceRef = useRef<HTMLDivElement>(null);
     const [isGenerating, setIsGenerating] = useState(false);
 
@@ -116,7 +120,7 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
           ctx.fillStyle = '#94a3b8';
           ctx.fillText('VAT Number:', margin, y);
           ctx.fillStyle = '#ffffff';
-          ctx.fillText(data.fromVat, margin + 150 * scale, y);
+          ctx.fillText(data.fromVat, margin + 105 * scale, y);
         }
         
         // TO
@@ -144,7 +148,7 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
           ctx.fillStyle = '#94a3b8';
           ctx.fillText('EIN Number:', colCenter, y);
           ctx.fillStyle = '#ffffff';
-          ctx.fillText(data.toEin, colCenter + 120 * scale, y);
+          ctx.fillText(data.toEin, colCenter + 100 * scale, y);
         }
         
         // ITEMS TABLE
@@ -391,6 +395,9 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
           <Button variant="outline" onClick={onBack}>
             Back to Form
           </Button>
+          {onThemeChange && (
+            <ThemeToggle value={currentTheme} onChange={onThemeChange} />
+          )}
           <Button 
             onClick={generatePDF}
             disabled={isGenerating}

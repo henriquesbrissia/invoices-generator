@@ -1,23 +1,51 @@
 # Invoice Generator
 
-A modern web application for generating professional PDF invoices. Built with Next.js and Shadcn UI.
+A modern, responsive web application for generating professional invoices. Built with Next.js, React, TypeScript, and modern UI frameworks.
 
 ## Features
 
-- Easy-to-use form interface
-- Real-time invoice preview
+- Easy-to-use invoice form with validation
+- Dark and light invoice templates
 - PDF export functionality
-- Professional dark-themed invoice design
 - Responsive design for all devices
+- Form data persistence with localStorage
 
 ## Tech Stack
 
-- Next.js 14
-- TypeScript
-- Tailwind CSS
-- Shadcn UI
-- React Hook Form
-- jsPDF & html2canvas for PDF generation
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **UI Components**: Shadcn UI, Radix UI
+- **Form Handling**: React Hook Form with Zod validation
+- **Styling**: Tailwind CSS
+- **PDF Generation**: jsPDF
+
+## Architecture Highlights
+
+- **Component Structure**: Modular components with clear separation of concerns
+- **Form Validation**: Schema-based validation with Zod
+- **State Management**: React Hooks with custom hooks for form persistence
+- **Optimization**:
+  - Server Components for static parts
+  - Client Components only where interactivity is needed
+  - Modular file structure with proper naming conventions
+  - Reusable components for improved maintainability
+
+## Recent Optimizations
+
+- **Architecture Improvements**:
+  - Separated client and server components
+  - Implemented React Server Components (RSC) for better performance
+  - Modularized components for better maintainability
+  
+- **Code Quality**:
+  - Added Zod schema validation
+  - Created reusable components (DateRangePicker, InvoiceItem)
+  - Improved type safety throughout the application
+  
+- **Developer Experience**:
+  - Added JSDoc comments for better intellisense
+  - Consistent file and component naming conventions
+  - Improved code organization with dedicated directories
 
 ## Getting Started
 
@@ -60,3 +88,11 @@ npm run dev
 ## License
 
 MIT
+
+## Future Improvements
+
+- Add more invoice templates
+- Implement internationalization (i18n) support
+- Add cloud storage for invoices
+- Integrate payment processing
+- Add analytics for invoice tracking
