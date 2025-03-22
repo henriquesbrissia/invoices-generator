@@ -51,19 +51,47 @@ export function InvoiceForm({ onSubmit }: InvoiceFormProps) {
     }
   });
 
+  // Define helper functions for serialization/deserialization
+  const serializeItems = (items: InvoiceItemType[]) => {
+    return items.map(item => ({
+      ...item,
+      startDate: item.startDate ? item.startDate.toISOString() : null,
+      endDate: item.endDate ? item.endDate.toISOString() : null
+    }));
+  };
+
   // Handle form persistence with custom transformations
   const { saveFormData } = useFormPersistence<InvoiceData>(
     form,
     'invoiceFormData',
-    (data) => data, // No transformation needed before saving
+    (data) => {
+      // Create a safe copy before transforming
+      const dataClone = { ...data };
+      
+      // Apply serialization to dates
+      if (dataClone.items) {
+        // Use specific type for serialized items
+        dataClone.items = serializeItems(dataClone.items) as unknown as InvoiceItemType[];
+      }
+      
+      return dataClone;
+    },
     (loadedData) => {
-      // Transform dates after loading from localStorage
+      // Transform dates back to Date objects after loading from localStorage
       if (loadedData.items) {
-        loadedData.items = loadedData.items.map((item: InvoiceItemType) => ({
-          ...item,
-          startDate: item.startDate ? new Date(item.startDate) : null,
-          endDate: item.endDate ? new Date(item.endDate) : null
-        }));
+        loadedData.items = loadedData.items.map((item: unknown) => {
+          // Need to use any for proper type conversion with date objects
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const typedItem = item as any;
+          return {
+            ...item as Omit<InvoiceItemType, 'startDate' | 'endDate'> & { 
+              startDate: string | null; 
+              endDate: string | null; 
+            },
+            startDate: typedItem.startDate ? new Date(typedItem.startDate) : null,
+            endDate: typedItem.endDate ? new Date(typedItem.endDate) : null
+          };
+        });
         setItems(loadedData.items);
       }
       return loadedData;
@@ -91,11 +119,14 @@ export function InvoiceForm({ onSubmit }: InvoiceFormProps) {
   };
 
   const updateItem = (index: number, field: keyof InvoiceItemType, value: string | number | Date | null) => {
+    // Create a new copy of the items array
     const newItems = [...items];
     
-    // For date fields, also update the date text field
+    // For date fields, also update the date text field and ensure date objects are properly created
     if (field === 'startDate' || field === 'endDate') {
-      newItems[index] = { ...newItems[index], [field]: value };
+      // Ensure we have a valid Date object or null
+      const dateValue = value instanceof Date ? new Date(value) : value;
+      newItems[index] = { ...newItems[index], [field]: dateValue };
       
       // If both dates are defined, update the date field
       if (newItems[index].startDate && newItems[index].endDate) {
@@ -108,7 +139,16 @@ export function InvoiceForm({ onSubmit }: InvoiceFormProps) {
       newItems[index] = { ...newItems[index], [field]: value };
     }
     
+    // Update the items state
     setItems(newItems);
+    
+    // Also update the form's internal state to ensure validation works
+    const currentItems = form.getValues('items');
+    if (currentItems) {
+      const updatedItems = [...currentItems];
+      updatedItems[index] = newItems[index];
+      form.setValue('items', updatedItems, { shouldValidate: true });
+    }
   };
 
   const calculateTotal = () => {
@@ -120,7 +160,12 @@ export function InvoiceForm({ onSubmit }: InvoiceFormProps) {
       // Prepare final data with latest items state
       const finalData = {
         ...data,
-        items: items
+        items: items.map(item => ({
+          ...item,
+          // Ensure dates are actual Date objects
+          startDate: item.startDate ? new Date(item.startDate) : null,
+          endDate: item.endDate ? new Date(item.endDate) : null
+        }))
       };
       
       // Save to localStorage

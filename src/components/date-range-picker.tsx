@@ -23,14 +23,14 @@ export function DateRangePicker({
   displayValue
 }: DateRangePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [tempStartDate, setTempStartDate] = useState<Date | null>(startDate);
-  const [tempEndDate, setTempEndDate] = useState<Date | null>(endDate);
+  const [tempStartDate, setTempStartDate] = useState<Date | null>(startDate ? new Date(startDate) : null);
+  const [tempEndDate, setTempEndDate] = useState<Date | null>(endDate ? new Date(endDate) : null);
   const datePickerRef = useRef<HTMLDivElement>(null);
 
   // Update local state when props change
   useEffect(() => {
-    setTempStartDate(startDate);
-    setTempEndDate(endDate);
+    setTempStartDate(startDate ? new Date(startDate) : null);
+    setTempEndDate(endDate ? new Date(endDate) : null);
   }, [startDate, endDate]);
 
   // Close the calendar when clicking outside
@@ -58,7 +58,11 @@ export function DateRangePicker({
   };
 
   const handleApply = () => {
-    onApply(tempStartDate, tempEndDate);
+    // Make sure to pass new Date objects to prevent reference issues
+    onApply(
+      tempStartDate ? new Date(tempStartDate.getTime()) : null,
+      tempEndDate ? new Date(tempEndDate.getTime()) : null
+    );
     setIsOpen(false);
   };
 

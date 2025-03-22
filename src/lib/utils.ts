@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { enUS } from 'date-fns/locale'
 
 /**
  * Combines class names using clsx and tailwind-merge
@@ -27,11 +27,16 @@ export function formatDateRange(startDate: Date | null, endDate: Date | null): s
   if (!startDate || !endDate) return ''
   
   try {
-    const start = format(startDate, 'MMM dd', { locale: ptBR })
-    const end = format(endDate, 'MMM dd', { locale: ptBR })
-    const year = format(endDate, 'yyyy')
+    // Ensure dates are actual Date objects
+    const start = new Date(startDate)
+    const end = new Date(endDate)
     
-    return `${start} - ${end} ${year}`
+    // Format with en-US locale for better compatibility
+    const startFormatted = format(start, 'MMM dd', { locale: enUS })
+    const endFormatted = format(end, 'MMM dd', { locale: enUS })
+    const year = format(end, 'yyyy')
+    
+    return `${startFormatted} - ${endFormatted} ${year}`
   } catch (error) {
     console.error('Error formatting dates:', error)
     return ''

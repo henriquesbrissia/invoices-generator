@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prod-build": "rm -rf .next && next build",
+    "deploy": "rm -rf .next && next build && next start"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",
@@ -14,6 +16,7 @@
     "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-switch": "^1.1.3",
     "@types/react-datepicker": "^6.2.0",
+    "date-fns": "^2.30.0",
     "next": "15.2.3",
     "react": "^19.0.0",
     "react-datepicker": "^8.2.1",

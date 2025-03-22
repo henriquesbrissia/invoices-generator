@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { UseFormReturn, FieldValues } from 'react-hook-form';
 
 /**
@@ -16,11 +16,17 @@ export function useFormPersistence<T extends FieldValues>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   transformAfterLoad?: (data: any) => Partial<T>
 ) {
-  // Load saved form data on component mount
+  // Track if we've initialized from localStorage to avoid overriding user changes
+  const initialized = useRef(false);
+
+  // Load saved form data on component mount (only once)
   useEffect(() => {
-    const savedData = localStorage.getItem(storageKey);
-    if (savedData) {
-      try {
+    // Only load from localStorage if we haven't already initialized
+    if (initialized.current) return;
+    
+    try {
+      const savedData = localStorage.getItem(storageKey);
+      if (savedData) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let parsedData: any = JSON.parse(savedData);
         
@@ -29,19 +35,26 @@ export function useFormPersistence<T extends FieldValues>(
           parsedData = transformAfterLoad(parsedData);
         }
         
+        // Reset the form with parsed data
         form.reset(parsedData);
-      } catch (error) {
-        console.error(`Error loading saved data for ${storageKey}:`, error);
-        localStorage.removeItem(storageKey);
+        initialized.current = true;
       }
+    } catch (error) {
+      console.error(`Error loading saved data for ${storageKey}:`, error);
+      // Clear corrupted data
+      localStorage.removeItem(storageKey);
     }
   }, [form, storageKey, transformAfterLoad]);
 
   // Save form data to localStorage
   const saveFormData = (data: T) => {
     try {
+      // Create a deep copy to avoid reference issues
+      const dataCopy = JSON.parse(JSON.stringify(data));
+      
       // Apply transformation if provided
-      const dataToSave = transformBeforeSave ? transformBeforeSave(data) : data;
+      const dataToSave = transformBeforeSave ? transformBeforeSave(dataCopy as T) : dataCopy;
+      
       localStorage.setItem(storageKey, JSON.stringify(dataToSave));
       return true;
     } catch (error) {

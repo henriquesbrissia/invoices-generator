@@ -17,16 +17,22 @@ interface InvoiceItemProps {
 
 export function InvoiceItem({ item, index, onRemove, onUpdate }: InvoiceItemProps) {
   const handleDateRangeChange = (startDate: Date | null, endDate: Date | null) => {
-    onUpdate('startDate', startDate);
-    onUpdate('endDate', endDate);
+    const validStartDate = startDate ? new Date(startDate.getTime()) : null;
+    const validEndDate = endDate ? new Date(endDate.getTime()) : null;
     
-    if (startDate && endDate) {
-      const formattedDate = formatDateRange(startDate, endDate);
+    onUpdate('startDate', validStartDate);
+    onUpdate('endDate', validEndDate);
+    
+    if (validStartDate && validEndDate) {
+      const formattedDate = formatDateRange(validStartDate, validEndDate);
       onUpdate('date', formattedDate);
     } else {
       onUpdate('date', '');
     }
   };
+
+  const validStartDate = item.startDate ? new Date(item.startDate.valueOf()) : null; 
+  const validEndDate = item.endDate ? new Date(item.endDate.valueOf()) : null;
 
   return (
     <div className="border border-input rounded-md p-5 mb-4 relative">
@@ -60,8 +66,8 @@ export function InvoiceItem({ item, index, onRemove, onUpdate }: InvoiceItemProp
             Date Range
           </Label>
           <DateRangePicker
-            startDate={item.startDate}
-            endDate={item.endDate}
+            startDate={validStartDate}
+            endDate={validEndDate}
             displayValue={item.date}
             onApply={handleDateRangeChange}
           />
