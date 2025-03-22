@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Plus } from 'lucide-react';
 import { InvoiceItem } from '@/components/invoice-item';
 import { useFormPersistence } from '@/hooks/use-form-persistence';
-import { formatDateRange, formatCurrency } from '@/lib/utils';
+import { formatDateRange } from '@/lib/utils';
 import { InvoiceData, InvoiceItem as InvoiceItemType, invoiceSchema } from '@/lib/schema';
 
 interface InvoiceFormProps {

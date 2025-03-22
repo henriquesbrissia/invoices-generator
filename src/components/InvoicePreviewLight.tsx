@@ -1,7 +1,6 @@
 import { forwardRef, useRef, useState, CSSProperties } from "react";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { InvoiceData } from "@/lib/schema";
 import { Button } from "@/components/ui/button";

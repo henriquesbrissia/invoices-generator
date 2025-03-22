@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { UseFormReturn, FieldValues } from 'react-hook-form';
 
 /**
  * Hook to handle form persistence in localStorage
@@ -8,10 +8,12 @@ import { UseFormReturn } from 'react-hook-form';
  * @param transformBeforeSave Optional function to transform data before saving
  * @param transformAfterLoad Optional function to transform data after loading
  */
-export function useFormPersistence<T extends Record<string, any>>(
+export function useFormPersistence<T extends FieldValues>(
   form: UseFormReturn<T>,
   storageKey: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   transformBeforeSave?: (data: T) => any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   transformAfterLoad?: (data: any) => Partial<T>
 ) {
   // Load saved form data on component mount
@@ -19,7 +21,8 @@ export function useFormPersistence<T extends Record<string, any>>(
     const savedData = localStorage.getItem(storageKey);
     if (savedData) {
       try {
-        let parsedData = JSON.parse(savedData);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let parsedData: any = JSON.parse(savedData);
         
         // Apply transformation if provided
         if (transformAfterLoad) {
@@ -32,7 +35,7 @@ export function useFormPersistence<T extends Record<string, any>>(
         localStorage.removeItem(storageKey);
       }
     }
-  }, []);
+  }, [form, storageKey, transformAfterLoad]);
 
   // Save form data to localStorage
   const saveFormData = (data: T) => {
