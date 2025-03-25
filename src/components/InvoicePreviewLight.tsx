@@ -14,7 +14,7 @@ type InvoicePreviewLightProps = {
 };
 
 const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>(
-  ({ data, onBack, onThemeChange, currentTheme = 'light' }) => {
+  ({ data, onBack, onThemeChange, currentTheme = 'light' }, ref) => {
     const invoiceRef = useRef<HTMLDivElement>(null);
     const [isGenerating, setIsGenerating] = useState(false);
 
@@ -74,45 +74,45 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         ctx.fillRect(0, 0, width, height);
         
         // Scale to fit the new size
-        const margin = 120 * scale;
+        const margin = 120 * scale; // Increased margin for better spacing
         const contentWidth = width - (margin * 2);
         
-        // HEADER - INVOICE
-        ctx.font = `bold ${36 * scale}px Arial`;
+        // HEADER - INVOICE (slightly smaller font)
+        ctx.font = `bold ${32 * scale}px Arial`;
         ctx.fillStyle = '#1e293b';
         ctx.fillText('INVOICE', margin, margin);
         
-        // Invoice number
-        ctx.font = `${18 * scale}px Arial`;
+        // Invoice number (reduced font size)
+        ctx.font = `${16 * scale}px Arial`;
         ctx.textAlign = 'right';
         ctx.fillStyle = '#1e293b';
         ctx.fillText(data.invoiceNumber, width - margin, margin);
         ctx.fillStyle = '#64748b';
-        ctx.fillText('INVOICE NUMBER', width - margin, margin + 40 * scale);
+        ctx.fillText('INVOICE NUMBER', width - margin, margin + 36 * scale);
         
         // Reset alignment
         ctx.textAlign = 'left';
         
-        // SENDER AND RECIPIENT INFORMATION
-        const headerY = margin + 120 * scale;
+        // SENDER AND RECIPIENT INFORMATION (increased spacing between sections)
+        const headerY = margin + 140 * scale;
         
         // FROM
-        ctx.font = `${16 * scale}px Arial`;
+        ctx.font = `${14 * scale}px Arial`;
         ctx.fillStyle = '#64748b';
         ctx.fillText('FROM', margin, headerY);
         
         ctx.fillStyle = '#1e293b';
-        ctx.font = `bold ${20 * scale}px Arial`;
-        ctx.fillText(data.fromCompany, margin, headerY + 40 * scale);
+        ctx.font = `bold ${18 * scale}px Arial`;
+        ctx.fillText(data.fromCompany, margin, headerY + 36 * scale);
         
-        // Sender address
-        ctx.font = `${16 * scale}px Arial`;
+        // Sender address (reduced font size for better compactness)
+        ctx.font = `${14 * scale}px Arial`;
         ctx.fillStyle = '#334155';
         const addressLines = data.fromAddress.split('\n');
-        let y = headerY + 80 * scale;
+        let y = headerY + 72 * scale;
         addressLines.forEach(line => {
           ctx.fillText(line, margin, y);
-          y += 24 * scale;
+          y += 20 * scale; // Reduced line spacing
         });
         
         // VAT/ID Number
@@ -121,7 +121,7 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
           ctx.fillStyle = '#64748b';
           ctx.fillText('VAT Number:', margin, y);
           ctx.fillStyle = '#1e293b';
-          ctx.fillText(data.fromVat, margin + 105 * scale, y);
+          ctx.fillText(data.fromVat, margin + 95 * scale, y);
         }
         
         // TO
@@ -130,117 +130,113 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         ctx.fillText('TO', colCenter, headerY);
         
         ctx.fillStyle = '#1e293b';
-        ctx.font = `bold ${20 * scale}px Arial`;
-        ctx.fillText(data.toCompany, colCenter, headerY + 40 * scale);
+        ctx.font = `bold ${18 * scale}px Arial`;
+        ctx.fillText(data.toCompany, colCenter, headerY + 36 * scale);
         
         // Recipient address
-        ctx.font = `${16 * scale}px Arial`;
+        ctx.font = `${14 * scale}px Arial`;
         ctx.fillStyle = '#334155';
         const toAddressLines = data.toAddress.split('\n');
-        y = headerY + 80 * scale;
+        y = headerY + 72 * scale;
         toAddressLines.forEach(line => {
           ctx.fillText(line, colCenter, y);
-          y += 24 * scale;
+          y += 20 * scale; // Reduced line spacing
         });
         
         // EIN Number
         if (data.toEin) {
-          y = Math.max(y, headerY + 150 * scale);
+          y = Math.max(y, headerY + 140 * scale);
           ctx.fillStyle = '#64748b';
           ctx.fillText('EIN Number:', colCenter, y);
           ctx.fillStyle = '#1e293b';
-          ctx.fillText(data.toEin, colCenter + 100 * scale, y);
+          ctx.fillText(data.toEin, colCenter + 90 * scale, y);
         }
         
-        // ITEMS TABLE
-        const tableY = headerY + 300 * scale;
+        // ITEMS TABLE - Improved spacing and positioning
+        const tableY = headerY + 260 * scale; // Reduced the gap between address and table
         
         // Table headers
         ctx.fillStyle = '#64748b';
-        ctx.font = `${16 * scale}px Arial`;
+        ctx.font = `${14 * scale}px Arial`;
         
-        // Define columns - more spaced to avoid overlapping
-        const descCol = margin; // Description (35%)
-        const dateCol = margin + contentWidth * 0.3; // Date (30%)
-        const rateCol = margin + contentWidth * 0.78; // Rate (15%)
-        const totalCol = width - margin; // Total (20%)
+        // Define columns - more evenly spaced
+        const descCol = margin; // Description column
+        const dateCol = margin + contentWidth * 0.44; // Date column (moved right)
+        const amountCol = width - margin; // Amount column
         
         // Headers
         ctx.textAlign = 'left';
         ctx.fillText('DESCRIPTION', descCol, tableY);
         ctx.fillText('DATE', dateCol, tableY);
         ctx.textAlign = 'right';
-        ctx.fillText('RATE', rateCol, tableY);
-        ctx.fillText('TOTAL', totalCol, tableY);
+        ctx.fillText('AMOUNT', amountCol, tableY);
         
         // Items
-        let itemY = tableY + 40 * scale;
+        let itemY = tableY + 32 * scale;
+        const lineHeight = 32 * scale; // Reduced line height
         
         data.items.forEach(item => {
           // Description
           ctx.textAlign = 'left';
           ctx.fillStyle = '#1e293b';
-          ctx.font = `bold ${16 * scale}px Arial`;
+          ctx.font = `bold ${14 * scale}px Arial`;
           ctx.fillText(item.description, descCol, itemY);
           
           // Date - use standardized format
-          ctx.font = `${16 * scale}px Arial`;
-          // Add clipping to prevent date text from invading the RATE column
+          ctx.font = `${14 * scale}px Arial`;
+          // Add clipping to prevent date text from invading other columns
           ctx.save();
-          ctx.rect(dateCol, itemY - 20 * scale, rateCol - dateCol - 20 * scale, 30 * scale);
+          ctx.rect(dateCol, itemY - 20 * scale, amountCol - dateCol - 20 * scale, 30 * scale);
           ctx.clip();
           ctx.fillText(formatDateRange(item), dateCol, itemY);
           ctx.restore();
           
-          // Rate
+          // Total renamed to Amount
           ctx.textAlign = 'right';
-          ctx.fillText(`$${item.rate} USD`, rateCol, itemY);
-          
-          // Total
-          ctx.fillText(`$${item.total} USD`, totalCol, itemY);
+          ctx.fillText(`$${item.total}`, amountCol, itemY);
           
           // Next item
-          itemY += 40 * scale;
+          itemY += lineHeight;
         });
         
-        // FINAL AMOUNT
-        const totalY = itemY + 80 * scale;
+        // FINAL AMOUNT renamed to TOTAL
+        const totalY = itemY + 25 * scale;
         ctx.textAlign = 'right';
         
         ctx.fillStyle = '#64748b';
-        ctx.fillText('FINAL AMOUNT', totalCol - 180 * scale, totalY);
+        ctx.fillText('TOTAL', amountCol - 130 * scale, totalY);
         
         // Formatted value with decimal places
         const formattedTotal = calculateTotal();
         ctx.fillStyle = '#0ea5e9'; // Azul para o tema claro
-        ctx.font = `bold ${24 * scale}px Arial`;
-        ctx.fillText(`$${formattedTotal} USD`, totalCol, totalY);
+        ctx.font = `bold ${22 * scale}px Arial`; // Slightly smaller font for total
+        ctx.fillText(`$${formattedTotal}`, amountCol, totalY);
         
-        // NOTES
-        let notesY = totalY + 80 * scale;
+        // NOTES with improved spacing
+        let notesY = totalY + 60 * scale;
         if (data.notes) {
           ctx.textAlign = 'left';
           ctx.fillStyle = '#64748b';
-          ctx.font = `${16 * scale}px Arial`;
+          ctx.font = `${14 * scale}px Arial`;
           ctx.fillText('NOTES', margin, notesY);
           
           ctx.fillStyle = '#334155';
-          ctx.font = `${16 * scale}px Arial`;
+          ctx.font = `${14 * scale}px Arial`;
           
           // Note text
-          notesY += 30 * scale;
+          notesY += 26 * scale;
           ctx.fillText(data.notes, margin, notesY);
         }
         
-        // PAYMENT INFORMATION
-        const footerY = Math.max(notesY + 80 * scale, totalY + 180 * scale);
+        // PAYMENT INFORMATION with improved spacing
+        const footerY = Math.max(notesY + 60 * scale, totalY + 120 * scale);
         ctx.fillStyle = '#64748b';
-        ctx.font = `${16 * scale}px Arial`;
+        ctx.font = `${14 * scale}px Arial`;
         ctx.textAlign = 'left';
         ctx.fillText('PAYMENT INFORMATION', margin, footerY);
         
-        // Divide into columns
-        const footerContentY = footerY + 40 * scale;
+        // Divide into columns with better spacing
+        const footerContentY = footerY + 36 * scale;
         const footerCol1 = margin;
         const footerCol2 = margin + contentWidth * 0.35;
         const footerCol3 = margin + contentWidth * 0.7;
@@ -250,28 +246,33 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         ctx.fillText('Account details', footerCol1, footerContentY);
         
         ctx.fillStyle = '#334155';
-        ctx.fillText('Account holder:', footerCol1, footerContentY + 30 * scale);
+        ctx.fillText('Account holder:', footerCol1, footerContentY + 26 * scale);
         ctx.fillStyle = '#1e293b';
-        ctx.fillText(data.paymentInfo.accountHolder, footerCol1, footerContentY + 55 * scale);
+        ctx.fillText(data.paymentInfo.accountHolder, footerCol1, footerContentY + 48 * scale);
         
         ctx.fillStyle = '#334155';
-        ctx.fillText('Account number:', footerCol1, footerContentY + 85 * scale);
+        ctx.fillText('Account number:', footerCol1, footerContentY + 74 * scale);
         ctx.fillStyle = '#1e293b';
-        ctx.fillText(data.paymentInfo.accountNumber, footerCol1, footerContentY + 110 * scale);
+        ctx.fillText(data.paymentInfo.accountNumber, footerCol1, footerContentY + 96 * scale);
         
         // Column 2: Bank address
         ctx.fillStyle = '#64748b';
         ctx.fillText('Bank address', footerCol2, footerContentY);
         
-        ctx.fillStyle = '#334155';
-        ctx.fillText(data.paymentInfo.bankAddress, footerCol2, footerContentY + 30 * scale);
+        // Split bank address into multiple lines if needed
+        const bankAddressLines = data.paymentInfo.bankAddress.split('\n');
+        let bankY = footerContentY + 26 * scale;
+        bankAddressLines.forEach(line => {
+          ctx.fillText(line, footerCol2, bankY);
+          bankY += 20 * scale; // Similar spacing as used for other address blocks
+        });
         
         // Column 3: Questions and contact
         ctx.fillStyle = '#64748b';
         ctx.fillText('Questions and contact', footerCol3, footerContentY);
         
         ctx.fillStyle = '#334155';
-        ctx.fillText(data.paymentInfo.contactEmail, footerCol3, footerContentY + 30 * scale);
+        ctx.fillText(data.paymentInfo.contactEmail, footerCol3, footerContentY + 26 * scale);
         
         // Convert to image and PDF
         const imgData = canvas.toDataURL('image/png', 1.0);
@@ -396,7 +397,7 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
     };
     
     return (
-      <div className="max-w-5xl mx-auto p-4 space-y-4">
+      <div className="max-w-5xl mx-auto p-4 space-y-4" ref={ref}>
         <div className="flex items-center justify-between">
           <Button variant="outline" onClick={onBack}>
             Back to Form
@@ -457,8 +458,7 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
               <tr>
                 <th style={{...theadStyle, width: '35%'}}>DESCRIPTION</th>
                 <th style={{...theadStyle, width: '30%'}}>DATE</th>
-                <th style={{...theadStyle, width: '15%', textAlign: 'right' as const}}>RATE</th>
-                <th style={{...theadStyle, width: '20%', textAlign: 'right' as const}}>TOTAL</th>
+                <th style={{...theadStyle, width: '20%', textAlign: 'right' as const}}>AMOUNT</th>
               </tr>
             </thead>
             <tbody>
@@ -466,8 +466,7 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
                 <tr key={index} style={trStyle}>
                   <td style={{...tdStyle, fontWeight: 'bold', color: '#1e293b'}}>{item.description}</td>
                   <td style={tdStyle}>{formatDateRange(item)}</td>
-                  <td style={{...tdStyle, textAlign: 'right' as const}}>${item.rate} USD</td>
-                  <td style={{...tdStyle, textAlign: 'right' as const}}>${item.total} USD</td>
+                  <td style={{...tdStyle, textAlign: 'right' as const}}>${item.total}</td>
                 </tr>
               ))}
             </tbody>
@@ -475,9 +474,9 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
 
           <div style={totalContainerStyle}>
             <div style={finalAmountStyle}>
-              <span style={{ color: '#64748b', alignSelf: 'center' }}>FINAL AMOUNT</span>
+              <span style={{ color: '#64748b', alignSelf: 'center' }}>TOTAL</span>
               <span style={amountValueStyle}>
-                ${calculateTotal()} USD
+                ${calculateTotal()}
               </span>
             </div>
           </div>
@@ -516,9 +515,9 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
                 <div style={footerTitleStyle}>
                   Bank address
                 </div>
-                <div style={{ fontSize: '0.875rem', color: '#334155' }}>
-                  {data.paymentInfo.bankAddress}
-                </div>
+                <div style={addressStyle}>
+                {formatAddress(data.paymentInfo.bankAddress)}
+              </div>
               </div>
 
               <div>

@@ -74,26 +74,10 @@ export function InvoiceItem({ item, index, onRemove, onUpdate }: InvoiceItemProp
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor={`item-rate-${index}`} className="mb-2 block">
-            Rate
-          </Label>
-          <div className="relative">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">$</span>
-          <Input
-            id={`item-rate-${index}`}
-            value={item.rate === '0.00' ? '' : item.rate}
-              onChange={(e) => onUpdate('rate', e.target.value)}
-              onBlur={(e) => onUpdate('rate', formatCurrency(e.target.value))}
-              placeholder="0.00"
-              className="pl-7 w-full"
-            />
-          </div>
-        </div>
+      <div>
         <div>
           <Label htmlFor={`item-total-${index}`} className="mb-2 block">
-            Total
+            Amount
           </Label>
           <div className="relative">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">$</span>
