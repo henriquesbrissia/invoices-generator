@@ -66,6 +66,7 @@ function InvoiceClient({ initialTemplate = 'dark' }: InvoiceClientProps) {
   const handleClearLocalStorage = () => {
     if (window.confirm('This will clear all saved form data. You will lose any unsaved changes. Continue?')) {
       localStorage.removeItem('invoiceFormData');
+      localStorage.removeItem('invoiceIntervalCards');
       window.location.reload();
     }
   };
