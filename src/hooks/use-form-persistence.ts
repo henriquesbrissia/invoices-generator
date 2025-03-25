@@ -46,6 +46,25 @@ export function useFormPersistence<T extends FieldValues>(
     }
   }, [form, storageKey, transformAfterLoad]);
 
+  // Save form data whenever it changes
+  useEffect(() => {
+    const subscription = form.watch((data) => {
+      try {
+        // Create a deep copy to avoid reference issues
+        const dataCopy = JSON.parse(JSON.stringify(data));
+        
+        // Apply transformation if provided
+        const dataToSave = transformBeforeSave ? transformBeforeSave(dataCopy as T) : dataCopy;
+        
+        localStorage.setItem(storageKey, JSON.stringify(dataToSave));
+      } catch (error) {
+        console.error(`Error saving data to ${storageKey}:`, error);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form, storageKey, transformBeforeSave]);
+
   // Save form data to localStorage
   const saveFormData = (data: T) => {
     try {

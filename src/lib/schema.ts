@@ -1,12 +1,25 @@
 import { z } from 'zod';
 
+export type IntervalType = 'day' | 'week' | 'weekend' | 'month';
+
+export interface DateSegment {
+  start: Date;
+  end: Date;
+}
+
 export const invoiceItemSchema = z.object({
   description: z.string().min(1, "Description is required"),
   date: z.string(),
   startDate: z.date().nullable(),
   endDate: z.date().nullable(),
   rate: z.string(),
-  total: z.string()
+  total: z.string(),
+  intervalType: z.enum(['day', 'week', 'weekend', 'month']).optional(),
+  segmentCount: z.number().optional(),
+  segments: z.array(z.object({
+    start: z.date(),
+    end: z.date()
+  })).optional().nullable()
 });
 
 export const invoicePaymentInfoSchema = z.object({
