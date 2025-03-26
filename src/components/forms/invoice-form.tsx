@@ -764,10 +764,23 @@ export function InvoiceForm({ onSubmit }: InvoiceFormProps) {
 
         {/* Invoice Items */}
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Items</CardTitle>
+            <FormField
+              control={form.control}
+              name="invoiceNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Invoice Number</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="INV-001" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-8">
             {intervalCards.map((card, index) => (
               <Card key={card.id} className="border border-muted">
                 <CardHeader className="flex flex-row items-center justify-between p-4">
