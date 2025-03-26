@@ -74,7 +74,7 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         ctx.fillRect(0, 0, width, height);
         
         // Scale to fit the new size
-        const margin = 120 * scale; // Increased margin for better spacing
+        const margin = 100 * scale; // Increased margin for better spacing
         const contentWidth = width - (margin * 2);
         
         // HEADER - INVOICE (slightly smaller font)
@@ -88,13 +88,13 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         ctx.fillStyle = '#1e293b';
         ctx.fillText(data.invoiceNumber, width - margin, margin);
         ctx.fillStyle = '#64748b';
-        ctx.fillText('INVOICE NUMBER', width - margin, margin + 36 * scale);
+        ctx.fillText('INVOICE NUMBER', width - margin, margin + 26 * scale);
         
         // Reset alignment
         ctx.textAlign = 'left';
         
         // SENDER AND RECIPIENT INFORMATION (increased spacing between sections)
-        const headerY = margin + 140 * scale;
+        const headerY = margin + 120 * scale;
         
         // FROM
         ctx.font = `${14 * scale}px Arial`;
@@ -200,20 +200,20 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         });
         
         // FINAL AMOUNT renamed to TOTAL
-        const totalY = itemY + 25 * scale;
+        const totalY = itemY + 65 * scale;
         ctx.textAlign = 'right';
         
         ctx.fillStyle = '#64748b';
-        ctx.fillText('TOTAL', amountCol - 130 * scale, totalY);
+        ctx.fillText('TOTAL', amountCol - 120 * scale, totalY);
         
         // Formatted value with decimal places
         const formattedTotal = calculateTotal();
-        ctx.fillStyle = '#0ea5e9'; // Azul para o tema claro
+        ctx.fillStyle = '#0ea5e9';
         ctx.font = `bold ${22 * scale}px Arial`; // Slightly smaller font for total
         ctx.fillText(`$${formattedTotal}`, amountCol, totalY);
         
         // NOTES with improved spacing
-        let notesY = totalY + 60 * scale;
+        let notesY = totalY + scale;
         if (data.notes) {
           ctx.textAlign = 'left';
           ctx.fillStyle = '#64748b';
@@ -229,7 +229,7 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         }
         
         // PAYMENT INFORMATION with improved spacing
-        const footerY = Math.max(notesY + 60 * scale, totalY + 120 * scale);
+        const footerY = Math.max(notesY + 90 * scale, totalY + 120 * scale);
         ctx.fillStyle = '#64748b';
         ctx.font = `${14 * scale}px Arial`;
         ctx.textAlign = 'left';
@@ -241,25 +241,20 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         const footerCol2 = margin + contentWidth * 0.35;
         const footerCol3 = margin + contentWidth * 0.7;
         
-        // Column 1: Account details
+        ctx.fillText('Account holder', footerCol1, footerContentY);
+        ctx.fillStyle = '#1e293b';
+        ctx.fillText(data.paymentInfo.accountHolder, footerCol1, footerContentY + 26 * scale);
+        
         ctx.fillStyle = '#64748b';
-        ctx.fillText('Account details', footerCol1, footerContentY);
-        
-        ctx.fillStyle = '#334155';
-        ctx.fillText('Account holder:', footerCol1, footerContentY + 26 * scale);
+        ctx.fillText('Account number', footerCol1, footerContentY + 54 * scale);
         ctx.fillStyle = '#1e293b';
-        ctx.fillText(data.paymentInfo.accountHolder, footerCol1, footerContentY + 48 * scale);
-        
-        ctx.fillStyle = '#334155';
-        ctx.fillText('Account number:', footerCol1, footerContentY + 74 * scale);
-        ctx.fillStyle = '#1e293b';
-        ctx.fillText(data.paymentInfo.accountNumber, footerCol1, footerContentY + 96 * scale);
+        ctx.fillText(data.paymentInfo.accountNumber, footerCol1, footerContentY + 80 * scale);
         
         // Column 2: Bank address
         ctx.fillStyle = '#64748b';
         ctx.fillText('Bank address', footerCol2, footerContentY);
-        
-        // Split bank address into multiple lines if needed
+
+        ctx.fillStyle = '#1e293b';
         const bankAddressLines = data.paymentInfo.bankAddress.split('\n');
         let bankY = footerContentY + 26 * scale;
         bankAddressLines.forEach(line => {

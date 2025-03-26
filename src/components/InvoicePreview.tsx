@@ -74,7 +74,7 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
         ctx.fillRect(0, 0, width, height);
         
         // Scale to fit the new size
-        const margin = 110 * scale; // Increased margin for better spacing
+        const margin = 100 * scale; // Increased margin for better spacing
         const contentWidth = width - (margin * 2);
         
         // HEADER - INVOICE (slightly smaller font)
@@ -86,13 +86,14 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
         ctx.font = `${16 * scale}px Arial`;
         ctx.textAlign = 'right';
         ctx.fillText(data.invoiceNumber, width - margin, margin);
-        ctx.fillText('INVOICE NUMBER', width - margin, margin + 36 * scale);
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText('INVOICE NUMBER', width - margin, margin + 26 * scale);
         
         // Reset alignment
         ctx.textAlign = 'left';
         
         // SENDER AND RECIPIENT INFORMATION (increased spacing between sections)
-        const headerY = margin + 140 * scale;
+        const headerY = margin + 120 * scale;
         
         // FROM
         ctx.font = `${14 * scale}px Arial`;
@@ -198,7 +199,7 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
         });
         
         // FINAL AMOUNT renamed to TOTAL
-        const totalY = itemY + 25 * scale;
+        const totalY = itemY + 65 * scale;
         ctx.textAlign = 'right';
         
         ctx.fillStyle = '#cbd5e1';
@@ -211,7 +212,7 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
         ctx.fillText(`$${formattedTotal}`, amountCol, totalY);
         
         // NOTES with improved spacing
-        let notesY = totalY + 60 * scale;
+        let notesY = totalY + scale;
         if (data.notes) {
           ctx.textAlign = 'left';
           ctx.fillStyle = '#94a3b8';
@@ -227,7 +228,7 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
         }
         
         // PAYMENT INFORMATION with improved spacing
-        const footerY = Math.max(notesY + 60 * scale, totalY + 120 * scale);
+        const footerY = Math.max(notesY + 90 * scale, totalY + 120 * scale);
         ctx.fillStyle = '#94a3b8';
         ctx.font = `${14 * scale}px Arial`;
         ctx.textAlign = 'left';
@@ -239,16 +240,14 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
         const footerCol2 = margin + contentWidth * 0.35;
         const footerCol3 = margin + contentWidth * 0.7;
         
-        // Column 1: Account details
-        ctx.fillStyle = '#94a3b8';
-        ctx.fillText('Account details', footerCol1, footerContentY);
-        
+        ctx.fillText('Account holder', footerCol1, footerContentY);
         ctx.fillStyle = '#ffffff';
-        ctx.fillText('Account holder:', footerCol1, footerContentY + 26 * scale);
-        ctx.fillText(data.paymentInfo.accountHolder, footerCol1, footerContentY + 48 * scale);
+        ctx.fillText(data.paymentInfo.accountHolder, footerCol1, footerContentY + 26 * scale);
         
-        ctx.fillText('Account number:', footerCol1, footerContentY + 74 * scale);
-        ctx.fillText(data.paymentInfo.accountNumber, footerCol1, footerContentY + 96 * scale);
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText('Account number', footerCol1, footerContentY + 54 * scale);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(data.paymentInfo.accountNumber, footerCol1, footerContentY + 80 * scale);
         
         // Column 2: Bank address
         ctx.fillStyle = '#94a3b8';
@@ -486,9 +485,6 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
             <div style={{...labelStyle, marginBottom: '1rem'}}>PAYMENT INFORMATION</div>
             <div style={footerGridStyle}>
               <div>
-                <div style={footerTitleStyle}>
-                  Account details
-                </div>
                 <div style={{ fontSize: '0.875rem' }}>
                   <div style={{ marginBottom: '0.5rem' }}>
                     <span style={{ color: '#94a3b8' }}>Account holder:</span>
