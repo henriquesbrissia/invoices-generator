@@ -186,6 +186,7 @@ export function InvoiceForm({ onSubmit }: InvoiceFormProps) {
         accountHolder: '',
         accountNumber: '',
         bankAddress: '',
+        swiftNumber: '',
         contactEmail: ''
       }
     },
@@ -811,7 +812,7 @@ export function InvoiceForm({ onSubmit }: InvoiceFormProps) {
                   
                   {/* Extract only the Interval Type part from IntervalDateRangePicker */}
                   <div>
-                    <Label className="mb-2 block">Step 2: Select Interval Type</Label>
+                    <Label className="mb-5 block">Step 2: Select Interval Type</Label>
                     <IntervalSelector 
                       value={card.intervalType}
                       onChange={(intervalType) => handleIntervalChange(card.id, intervalType)}
@@ -972,6 +973,20 @@ export function InvoiceForm({ onSubmit }: InvoiceFormProps) {
                       className="resize-none"
                       style={{ whiteSpace: 'pre-wrap', minHeight: '80px' }}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="paymentInfo.swiftNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>SWIFT Number</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="SWIFT/BIC code" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

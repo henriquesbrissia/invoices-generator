@@ -26,6 +26,7 @@ export const invoicePaymentInfoSchema = z.object({
   accountHolder: z.string().min(1, "Account holder is required"),
   accountNumber: z.string().min(1, "Account number is required"),
   bankAddress: z.string(),
+  swiftNumber: z.string().min(1, "SWIFT number is required"),
   contactEmail: z.string().email("Invalid email format").optional().default("")
 });
 

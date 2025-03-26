@@ -249,6 +249,12 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
         ctx.fillStyle = '#ffffff';
         ctx.fillText(data.paymentInfo.accountNumber, footerCol1, footerContentY + 80 * scale);
         
+        // Add SWIFT number
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText('SWIFT Number', footerCol1, footerContentY + 106 * scale);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(data.paymentInfo.swiftNumber, footerCol1, footerContentY + 132 * scale);
+        
         // Column 2: Bank address
         ctx.fillStyle = '#94a3b8';
         ctx.fillText('Bank address', footerCol2, footerContentY);
@@ -495,8 +501,14 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                   <div style={{ marginBottom: '0.5rem' }}>
                     <span style={{ color: '#94a3b8' }}>Account number:</span>
                   </div>
-                  <div>
+                  <div style={{ marginBottom: '1rem' }}>
                     {data.paymentInfo.accountNumber}
+                  </div>
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <span style={{ color: '#94a3b8' }}>SWIFT Number:</span>
+                  </div>
+                  <div>
+                    {data.paymentInfo.swiftNumber}
                   </div>
                 </div>
               </div>
