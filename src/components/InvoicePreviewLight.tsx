@@ -341,125 +341,127 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         </div>
 
         {/* Invoice preview area with Tailwind classes */}
-        <div ref={invoiceRef} className="bg-white text-slate-800 p-20 rounded-lg shadow-lg">
-          <div className="flex justify-between items-start mb-12">
-            <div>
-              <h1 className="text-3xl font-bold uppercase text-slate-800">INVOICE</h1>
-            </div>
-            <div className="text-right">
-              <div className="text-xl mb-1 text-slate-800">{data.invoiceNumber}</div>
-              <div className="text-sm text-slate-500">INVOICE NUMBER</div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-8 mb-24">
-            <div>
-              <div className="text-sm uppercase text-slate-500 mb-2">FROM</div>
-              <div className="font-bold mb-2 text-slate-800">{data.fromCompany}</div>
-              <div className="text-sm text-slate-600 mt-1">
-                {formatAddress(data.fromAddress)}
+        <div className="overflow-x-auto">
+          <div ref={invoiceRef} className="bg-white text-slate-800 p-20 rounded-lg shadow-lg origin-top-left scale-[0.7] sm:scale-100 w-[143%] sm:w-full">
+            <div className="flex justify-between items-start mb-12">
+              <div>
+                <h1 className="text-3xl font-bold uppercase text-slate-800">INVOICE</h1>
               </div>
-              {data.fromVat && (
-                <div className="text-sm mt-3">
-                  <span className="text-slate-500">VAT Number:</span> {data.fromVat}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <div className="text-sm uppercase text-slate-500 mb-2">TO</div>
-              <div className="font-bold mb-2 text-slate-800">{data.toCompany}</div>
-              <div className="text-sm text-slate-600 mt-1">
-                {formatAddress(data.toAddress)}
+              <div className="text-right">
+                <div className="text-xl mb-1 text-slate-800">{data.invoiceNumber}</div>
+                <div className="text-sm text-slate-500">INVOICE NUMBER</div>
               </div>
-              {data.toEin && (
-                <div className="text-sm mt-3">
-                  <span className="text-slate-500">EIN Number:</span> {data.toEin}
-                </div>
-              )}
             </div>
-          </div>
 
-          <table className="w-full mb-8">
-            <thead>
-              <tr>
-                <th className="text-left text-sm uppercase text-slate-500 pb-2 w-[44%]">DESCRIPTION</th>
-                <th className="text-left text-sm uppercase text-slate-500 pb-2 w-[27%]">DATE</th>
-                <th className="text-right text-sm uppercase text-slate-500 pb-2 w-[27%]">AMOUNT</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.items.map((item, index) => (
-                <tr key={index}>
-                  <td className="py-1.5" colSpan={3}>
-                    <div className="bg-gray-100 rounded-lg p-2 flex">
-                      <div className="w-[45%] font-bold text-sm text-slate-800">{item.description}</div>
-                      <div className="w-[30%] text-sm">{formatDateRange(item)}</div>
-                      <div className="w-[20%] text-sm text-right ml-auto">${item.total}</div>
-                    </div>
-                  </td>
+            <div className="grid grid-cols-2 gap-8 mb-24">
+              <div>
+                <div className="text-sm uppercase text-slate-500 mb-2">FROM</div>
+                <div className="font-bold mb-2 text-slate-800">{data.fromCompany}</div>
+                <div className="text-sm text-slate-600 mt-1">
+                  {formatAddress(data.fromAddress)}
+                </div>
+                {data.fromVat && (
+                  <div className="text-sm mt-3">
+                    <span className="text-slate-500">VAT Number:</span> {data.fromVat}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <div className="text-sm uppercase text-slate-500 mb-2">TO</div>
+                <div className="font-bold mb-2 text-slate-800">{data.toCompany}</div>
+                <div className="text-sm text-slate-600 mt-1">
+                  {formatAddress(data.toAddress)}
+                </div>
+                {data.toEin && (
+                  <div className="text-sm mt-3">
+                    <span className="text-slate-500">EIN Number:</span> {data.toEin}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <table className="w-full mb-8">
+              <thead>
+                <tr>
+                  <th className="text-left text-sm uppercase text-slate-500 pb-2 w-[44%]">DESCRIPTION</th>
+                  <th className="text-left text-sm uppercase text-slate-500 pb-2 w-[27%]">DATE</th>
+                  <th className="text-right text-sm uppercase text-slate-500 pb-2 w-[27%]">AMOUNT</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.items.map((item, index) => (
+                  <tr key={index}>
+                    <td className="py-1.5" colSpan={3}>
+                      <div className="bg-gray-100 rounded-lg p-2 flex">
+                        <div className="w-[45%] font-bold text-sm text-slate-800">{item.description}</div>
+                        <div className="w-[30%] text-sm">{formatDateRange(item)}</div>
+                        <div className="w-[20%] text-sm text-right ml-auto">${item.total}</div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-          <div className="flex justify-end mt-6 mb-8">
-            <div className="flex flex-col py-2">
-              <span className="text-slate-500 text-end">TOTAL</span>
-              <span className="text-2xl font-bold text-sky-600">
-                ${calculateTotal()}
-              </span>
-            </div>
-          </div>
-
-          {data.notes && (
-            <div className="mt-8 mb-8">
-              <div className="text-sm uppercase text-slate-500 mb-2">NOTES</div>
-              <div className="text-sm text-slate-600">{data.notes}</div>
-            </div>
-          )}
-
-          <div className="mt-12 pt-6 bg-gray-100 rounded-lg p-20 -mx-20 -mb-20">
-            <div className="text-sm uppercase text-slate-500 mb-4">PAYMENT INFORMATION</div>
-            <div className="grid grid-cols-3 gap-8 mt-4">
-              <div>
-                <div className="text-sm">
-                  <div className="mb-2">
-                    <span className="text-slate-500">Account holder</span>
-                  </div>
-                  <div className="mb-4 text-slate-800">
-                    {data.paymentInfo.accountHolder}
-                  </div>
-                  <div className="mb-2">
-                    <span className="text-slate-500">Account number</span>
-                  </div>
-                  <div className="mb-4 text-slate-800">
-                    {data.paymentInfo.accountNumber}
-                  </div>
-                  <div className="mb-2">
-                    <span className="text-slate-500">SWIFT Number</span>
-                  </div>
-                  <div className="text-slate-800">
-                    {data.paymentInfo.swiftNumber}
-                  </div>
-                </div>
+            <div className="flex justify-end mt-6 mb-8">
+              <div className="flex flex-col py-2">
+                <span className="text-slate-500 text-end">TOTAL</span>
+                <span className="text-2xl font-bold text-sky-600">
+                  ${calculateTotal()}
+                </span>
               </div>
+            </div>
 
-              <div>
-                <div className="text-sm text-slate-500 mb-3">
-                  Bank address
-                </div>
-                <div className="text-sm text-slate-600">
-                  {formatAddress(data.paymentInfo.bankAddress)}
-                </div>
+            {data.notes && (
+              <div className="mt-8 mb-8">
+                <div className="text-sm uppercase text-slate-500 mb-2">NOTES</div>
+                <div className="text-sm text-slate-600">{data.notes}</div>
               </div>
+            )}
 
-              <div>
-                <div className="text-sm text-slate-500 mb-3">
-                  Questions and contact
+            <div className="mt-12 pt-6 bg-gray-100 rounded-lg p-20 -mx-20 -mb-20">
+              <div className="text-sm uppercase text-slate-500 mb-4">PAYMENT INFORMATION</div>
+              <div className="grid grid-cols-3 gap-8 mt-4">
+                <div>
+                  <div className="text-sm">
+                    <div className="mb-2">
+                      <span className="text-slate-500">Account holder</span>
+                    </div>
+                    <div className="mb-4 text-slate-800">
+                      {data.paymentInfo.accountHolder}
+                    </div>
+                    <div className="mb-2">
+                      <span className="text-slate-500">Account number</span>
+                    </div>
+                    <div className="mb-4 text-slate-800">
+                      {data.paymentInfo.accountNumber}
+                    </div>
+                    <div className="mb-2">
+                      <span className="text-slate-500">SWIFT Number</span>
+                    </div>
+                    <div className="text-slate-800">
+                      {data.paymentInfo.swiftNumber}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm text-slate-600">
-                  {data.paymentInfo.contactEmail}
+
+                <div>
+                  <div className="text-sm text-slate-500 mb-3">
+                    Bank address
+                  </div>
+                  <div className="text-sm text-slate-600">
+                    {formatAddress(data.paymentInfo.bankAddress)}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-sm text-slate-500 mb-3">
+                    Questions and contact
+                  </div>
+                  <div className="text-sm text-slate-600">
+                    {data.paymentInfo.contactEmail}
+                  </div>
                 </div>
               </div>
             </div>
