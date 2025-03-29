@@ -1,4 +1,4 @@
-import { forwardRef, useRef, useState, CSSProperties } from "react";
+import { forwardRef, useRef, useState } from "react";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import jsPDF from "jspdf";
@@ -20,7 +20,7 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
 
     const formatAddress = (address: string) => {
       return address.split('\n').map((line, i) => (
-        <span key={i} style={{ display: 'block' }}>
+        <span key={i} className="block">
           {line}
         </span>
       ));
@@ -74,27 +74,28 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         ctx.fillRect(0, 0, width, height);
         
         // Scale to fit the new size
-        const margin = 100 * scale; // Increased margin for better spacing
+        const margin = 90 * scale; // Increased margin for better spacing
         const contentWidth = width - (margin * 2);
         
-        // HEADER - INVOICE (slightly smaller font)
+        // HEADER - INVOICE
         ctx.font = `bold ${32 * scale}px Arial`;
         ctx.fillStyle = '#1e293b';
         ctx.fillText('INVOICE', margin, margin);
         
-        // Invoice number (reduced font size)
-        ctx.font = `${16 * scale}px Arial`;
+        // Invoice number
+        ctx.font = `${19 * scale}px Arial`;
         ctx.textAlign = 'right';
         ctx.fillStyle = '#1e293b';
         ctx.fillText(data.invoiceNumber, width - margin, margin);
+        ctx.font = `${13 * scale}px Arial`;
         ctx.fillStyle = '#64748b';
-        ctx.fillText('INVOICE NUMBER', width - margin, margin + 26 * scale);
+        ctx.fillText('INVOICE NUMBER', width - margin, margin + 22 * scale);
         
         // Reset alignment
         ctx.textAlign = 'left';
         
-        // SENDER AND RECIPIENT INFORMATION (increased spacing between sections)
-        const headerY = margin + 120 * scale;
+        // SENDER AND RECIPIENT INFORMATION
+        const headerY = margin + 110 * scale;
         
         // FROM
         ctx.font = `${14 * scale}px Arial`;
@@ -117,7 +118,7 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         
         // VAT/ID Number
         if (data.fromVat) {
-          y += 10 * scale;
+          y += 5 * scale;
           ctx.fillStyle = '#64748b';
           ctx.fillText('VAT Number:', margin, y);
           ctx.fillStyle = '#1e293b';
@@ -145,7 +146,7 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         
         // EIN Number
         if (data.toEin) {
-          y = Math.max(y, headerY + 140 * scale);
+          y += 5 * scale;
           ctx.fillStyle = '#64748b';
           ctx.fillText('EIN Number:', colCenter, y);
           ctx.fillStyle = '#1e293b';
@@ -153,7 +154,7 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         }
         
         // ITEMS TABLE - Improved spacing and positioning
-        const tableY = headerY + 260 * scale; // Reduced the gap between address and table
+        const tableY = headerY + 215 * scale; // Reduced the gap between address and table
         
         // Table headers
         ctx.fillStyle = '#64748b';
@@ -177,6 +178,27 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
         
         data.items.forEach(item => {
           // Description
+          // Draw rounded rectangle for item background
+          ctx.fillStyle = '#f3f4f6'; // Light gray background for items
+          const rectX = descCol - 10 * scale;
+          const rectY = itemY - 19 * scale;
+          const rectWidth = 665 * scale;
+          const rectHeight = 30 * scale;
+          const radius = 8 * scale;
+
+          ctx.beginPath();
+          ctx.moveTo(rectX + radius, rectY);
+          ctx.lineTo(rectX + rectWidth - radius, rectY);
+          ctx.arcTo(rectX + rectWidth, rectY, rectX + rectWidth, rectY + radius, radius);
+          ctx.lineTo(rectX + rectWidth, rectY + rectHeight - radius);
+          ctx.arcTo(rectX + rectWidth, rectY + rectHeight, rectX + rectWidth - radius, rectY + rectHeight, radius);
+          ctx.lineTo(rectX + radius, rectY + rectHeight);
+          ctx.arcTo(rectX, rectY + rectHeight, rectX, rectY + rectHeight - radius, radius);
+          ctx.lineTo(rectX, rectY + radius);
+          ctx.arcTo(rectX, rectY, rectX + radius, rectY, radius);
+          ctx.closePath();
+          ctx.fill();
+
           ctx.textAlign = 'left';
           ctx.fillStyle = '#1e293b';
           ctx.font = `bold ${14 * scale}px Arial`;
@@ -191,29 +213,28 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
           ctx.fillText(formatDateRange(item), dateCol, itemY);
           ctx.restore();
           
-          // Total renamed to Amount
           ctx.textAlign = 'right';
           ctx.fillText(`$${item.total}`, amountCol, itemY);
           
           // Next item
-          itemY += lineHeight;
+          itemY += lineHeight + 8 * scale;
         });
         
         // FINAL AMOUNT renamed to TOTAL
-        const totalY = itemY + 65 * scale;
+        const totalY = itemY + 40 * scale;
         ctx.textAlign = 'right';
         
         ctx.fillStyle = '#64748b';
-        ctx.fillText('TOTAL', amountCol - 120 * scale, totalY);
+        ctx.fillText('TOTAL', amountCol, totalY - 26 * scale);
         
         // Formatted value with decimal places
         const formattedTotal = calculateTotal();
         ctx.fillStyle = '#0ea5e9';
-        ctx.font = `bold ${22 * scale}px Arial`; // Slightly smaller font for total
+        ctx.font = `bold ${22 * scale}px Arial`;
         ctx.fillText(`$${formattedTotal}`, amountCol, totalY);
         
         // NOTES with improved spacing
-        let notesY = totalY + scale;
+        let notesY = totalY + 50 * scale;
         if (data.notes) {
           ctx.textAlign = 'left';
           ctx.fillStyle = '#64748b';
@@ -228,8 +249,17 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
           ctx.fillText(data.notes, margin, notesY);
         }
         
-        // PAYMENT INFORMATION with improved spacing
-        const footerY = Math.max(notesY + 90 * scale, totalY + 120 * scale);
+        // Calculate the available space for content
+        const pageHeight = height;
+        const contentEndY = notesY + (data.notes ? scale : 0);
+        
+        // PAYMENT INFORMATION with fixed position at the bottom of the page
+        // Ensure minimum spacing from content or position at bottom if there's enough space
+        const footerHeight = 220 * scale; // Approximate height needed for footer content
+        const footerY = Math.max(pageHeight - footerHeight - 30 * scale, contentEndY + 80 * scale);
+        
+        ctx.fillStyle = '#f3f4f6'; // Light background for footer
+        ctx.fillRect(0, footerY - 30 * scale, width, pageHeight); // Extend to bottom of page
         ctx.fillStyle = '#64748b';
         ctx.font = `${14 * scale}px Arial`;
         ctx.textAlign = 'left';
@@ -293,110 +323,6 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
       }
     };
     
-    // Styles for screen view - Light theme
-    const screenStyles: CSSProperties = {
-      backgroundColor: '#ffffff',
-      color: '#1e293b',
-      padding: '2rem',
-      borderRadius: '0.5rem',
-      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-    };
-
-    const headerStyle: CSSProperties = {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      marginBottom: '3rem'
-    };
-
-    const gridContainerStyle: CSSProperties = {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(2, 1fr)',
-      gap: '2rem',
-      marginBottom: '3rem'
-    };
-
-    const labelStyle: CSSProperties = {
-      color: '#64748b',
-      textTransform: 'uppercase' as const,
-      fontSize: '0.875rem',
-      marginBottom: '0.5rem'
-    };
-
-    const addressStyle: CSSProperties = {
-      color: '#334155',
-      fontSize: '0.875rem',
-      marginTop: '0.25rem'
-    };
-
-    const tableStyle: CSSProperties = {
-      width: '100%',
-      borderCollapse: 'collapse' as const,
-      marginBottom: '2rem'
-    };
-
-    const theadStyle: CSSProperties = {
-      color: '#64748b',
-      textTransform: 'uppercase' as const,
-      fontSize: '0.875rem',
-      textAlign: 'left' as const,
-      paddingBottom: '0.5rem'
-    };
-
-    const trStyle: CSSProperties = {
-      borderBottom: '1px solid #f1f5f9'
-    };
-
-    const tdStyle: CSSProperties = {
-      padding: '0.75rem 0',
-      fontSize: '0.875rem'
-    };
-
-    const totalContainerStyle: CSSProperties = {
-      display: 'flex',
-      justifyContent: 'flex-end',
-      marginTop: '1.5rem',
-      marginBottom: '2rem'
-    };
-
-    const finalAmountStyle: CSSProperties = {
-      display: 'flex', 
-      justifyContent: 'space-between', 
-      width: '250px',
-      paddingTop: '0.5rem', 
-      paddingBottom: '0.5rem'
-    };
-
-    const amountValueStyle: CSSProperties = {
-      fontSize: '1.5rem',
-      fontWeight: 'bold',
-      color: '#0ea5e9' // Azul para o tema claro
-    };
-
-    const notesStyle: CSSProperties = {
-      marginTop: '2rem',
-      marginBottom: '2rem'
-    };
-
-    const footerStyle: CSSProperties = {
-      marginTop: '3rem',
-      paddingTop: '1.5rem'
-    };
-
-    const footerGridStyle: CSSProperties = {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(3, 1fr)',
-      gap: '2rem',
-      marginTop: '1rem'
-    };
-
-    const footerTitleStyle: CSSProperties = {
-      color: '#64748b',
-      textTransform: 'uppercase' as const,
-      fontSize: '0.875rem',
-      marginBottom: '0.75rem'
-    };
-    
     return (
       <div className="max-w-5xl mx-auto p-4 space-y-4" ref={ref}>
         <div className="flex items-center justify-between">
@@ -414,124 +340,125 @@ const InvoicePreviewLight = forwardRef<HTMLDivElement, InvoicePreviewLightProps>
           </Button>
         </div>
 
-        {/* Invoice preview area - layout light theme */}
-        <div ref={invoiceRef} style={screenStyles}>
-          <div style={headerStyle}>
+        {/* Invoice preview area with Tailwind classes */}
+        <div ref={invoiceRef} className="bg-white text-slate-800 p-20 rounded-lg shadow-lg">
+          <div className="flex justify-between items-start mb-12">
             <div>
-              <h1 style={{ fontSize: '2rem', fontWeight: 'bold', textTransform: 'uppercase' as const, color: '#1e293b' }}>INVOICE</h1>
+              <h1 className="text-3xl font-bold uppercase text-slate-800">INVOICE</h1>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '1.25rem', marginBottom: '0.25rem', color: '#1e293b' }}>{data.invoiceNumber}</div>
-              <div style={{ fontSize: '0.875rem', color: '#64748b' }}>INVOICE NUMBER</div>
+            <div className="text-right">
+              <div className="text-xl mb-1 text-slate-800">{data.invoiceNumber}</div>
+              <div className="text-sm text-slate-500">INVOICE NUMBER</div>
             </div>
           </div>
 
-          <div style={gridContainerStyle}>
+          <div className="grid grid-cols-2 gap-8 mb-24">
             <div>
-              <div style={labelStyle}>FROM</div>
-              <div style={{ fontWeight: 'bold', marginBottom: '0.5rem', color: '#1e293b' }}>{data.fromCompany}</div>
-              <div style={addressStyle}>
+              <div className="text-sm uppercase text-slate-500 mb-2">FROM</div>
+              <div className="font-bold mb-2 text-slate-800">{data.fromCompany}</div>
+              <div className="text-sm text-slate-600 mt-1">
                 {formatAddress(data.fromAddress)}
               </div>
               {data.fromVat && (
-                <div style={{ fontSize: '0.875rem', marginTop: '0.75rem' }}>
-                  <span style={{ color: '#64748b' }}>VAT Number:</span> {data.fromVat}
+                <div className="text-sm mt-3">
+                  <span className="text-slate-500">VAT Number:</span> {data.fromVat}
                 </div>
               )}
             </div>
 
             <div>
-              <div style={labelStyle}>TO</div>
-              <div style={{ fontWeight: 'bold', marginBottom: '0.5rem', color: '#1e293b' }}>{data.toCompany}</div>
-              <div style={addressStyle}>
+              <div className="text-sm uppercase text-slate-500 mb-2">TO</div>
+              <div className="font-bold mb-2 text-slate-800">{data.toCompany}</div>
+              <div className="text-sm text-slate-600 mt-1">
                 {formatAddress(data.toAddress)}
               </div>
               {data.toEin && (
-                <div style={{ fontSize: '0.875rem', marginTop: '0.75rem' }}>
-                  <span style={{ color: '#64748b' }}>EIN Number:</span> {data.toEin}
+                <div className="text-sm mt-3">
+                  <span className="text-slate-500">EIN Number:</span> {data.toEin}
                 </div>
               )}
             </div>
           </div>
 
-          <table style={tableStyle}>
+          <table className="w-full mb-8">
             <thead>
               <tr>
-                <th style={{...theadStyle, width: '35%'}}>DESCRIPTION</th>
-                <th style={{...theadStyle, width: '30%'}}>DATE</th>
-                <th style={{...theadStyle, width: '20%', textAlign: 'right' as const}}>AMOUNT</th>
+                <th className="text-left text-sm uppercase text-slate-500 pb-2 w-[44%]">DESCRIPTION</th>
+                <th className="text-left text-sm uppercase text-slate-500 pb-2 w-[27%]">DATE</th>
+                <th className="text-right text-sm uppercase text-slate-500 pb-2 w-[27%]">AMOUNT</th>
               </tr>
             </thead>
             <tbody>
               {data.items.map((item, index) => (
-                <tr key={index} style={trStyle}>
-                  <td style={{...tdStyle, fontWeight: 'bold', color: '#1e293b'}}>{item.description}</td>
-                  <td style={tdStyle}>{formatDateRange(item)}</td>
-                  <td style={{...tdStyle, textAlign: 'right' as const}}>${item.total}</td>
+                <tr key={index}>
+                  <td className="py-1.5" colSpan={3}>
+                    <div className="bg-gray-100 rounded-lg p-2 flex">
+                      <div className="w-[45%] font-bold text-sm text-slate-800">{item.description}</div>
+                      <div className="w-[30%] text-sm">{formatDateRange(item)}</div>
+                      <div className="w-[20%] text-sm text-right ml-auto">${item.total}</div>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
 
-          <div style={totalContainerStyle}>
-            <div style={finalAmountStyle}>
-              <span style={{ color: '#64748b', alignSelf: 'center' }}>TOTAL</span>
-              <span style={amountValueStyle}>
+          <div className="flex justify-end mt-6 mb-8">
+            <div className="flex flex-col py-2">
+              <span className="text-slate-500 text-end">TOTAL</span>
+              <span className="text-2xl font-bold text-sky-600">
                 ${calculateTotal()}
               </span>
             </div>
           </div>
 
           {data.notes && (
-            <div style={notesStyle}>
-              <div style={labelStyle}>NOTES</div>
-              <div style={{ fontSize: '0.875rem', color: '#334155' }}>{data.notes}</div>
+            <div className="mt-8 mb-8">
+              <div className="text-sm uppercase text-slate-500 mb-2">NOTES</div>
+              <div className="text-sm text-slate-600">{data.notes}</div>
             </div>
           )}
 
-          <div style={footerStyle}>
-            <div style={{...labelStyle, marginBottom: '1rem'}}>PAYMENT INFORMATION</div>
-            <div style={footerGridStyle}>
+          <div className="mt-12 pt-6 bg-gray-100 rounded-lg p-20 -mx-20 -mb-20">
+            <div className="text-sm uppercase text-slate-500 mb-4">PAYMENT INFORMATION</div>
+            <div className="grid grid-cols-3 gap-8 mt-4">
               <div>
-                <div style={footerTitleStyle}>
-                  Account details
-                </div>
-                <div style={{ fontSize: '0.875rem' }}>
-                  <div style={{ marginBottom: '0.5rem' }}>
-                    <span style={{ color: '#64748b' }}>Account holder:</span>
+                <div className="text-sm">
+                  <div className="mb-2">
+                    <span className="text-slate-500">Account holder</span>
                   </div>
-                  <div style={{ marginBottom: '1rem', color: '#1e293b' }}>
+                  <div className="mb-4 text-slate-800">
                     {data.paymentInfo.accountHolder}
                   </div>
-                  <div style={{ marginBottom: '0.5rem' }}>
-                    <span style={{ color: '#64748b' }}>Account number:</span>
+                  <div className="mb-2">
+                    <span className="text-slate-500">Account number</span>
                   </div>
-                  <div style={{ marginBottom: '1rem', color: '#1e293b' }}>
+                  <div className="mb-4 text-slate-800">
                     {data.paymentInfo.accountNumber}
                   </div>
-                  <div style={{ marginBottom: '0.5rem' }}>
-                    <span style={{ color: '#64748b' }}>SWIFT Number:</span>
+                  <div className="mb-2">
+                    <span className="text-slate-500">SWIFT Number</span>
                   </div>
-                  <div style={{ color: '#1e293b' }}>
+                  <div className="text-slate-800">
                     {data.paymentInfo.swiftNumber}
                   </div>
                 </div>
               </div>
 
               <div>
-                <div style={footerTitleStyle}>
+                <div className="text-sm text-slate-500 mb-3">
                   Bank address
                 </div>
-                <div style={addressStyle}>
-                {formatAddress(data.paymentInfo.bankAddress)}
-              </div>
+                <div className="text-sm text-slate-600">
+                  {formatAddress(data.paymentInfo.bankAddress)}
+                </div>
               </div>
 
               <div>
-                <div style={footerTitleStyle}>
+                <div className="text-sm text-slate-500 mb-3">
                   Questions and contact
                 </div>
-                <div style={{ fontSize: '0.875rem', color: '#334155' }}>
+                <div className="text-sm text-slate-600">
                   {data.paymentInfo.contactEmail}
                 </div>
               </div>
